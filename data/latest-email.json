@@ -1,28 +1,8 @@
 {
-  "timestamp": "2025-09-14T14:04:38.111Z",
-  "subject": "Hey",
-  "textContent": "\nThis is a longer text and it still doesn’t work does it?",
-  "htmlContent": "",
-  "sender": {
-    "value": [
-      {
-        "address": "christophe.stoll@me.com",
-        "name": "Christophe Stoll"
-      }
-    ],
-    "html": "<span class=\"mp_address_group\"><span class=\"mp_address_name\">Christophe Stoll</span> &lt;<a href=\"mailto:christophe.stoll@me.com\" class=\"mp_address_email\">christophe.stoll@me.com</a>&gt;</span>",
-    "text": "\"Christophe Stoll\" <christophe.stoll@me.com>"
-  },
-  "recipient": {
-    "value": [
-      {
-        "address": "family@stoll.studio",
-        "name": ""
-      }
-    ],
-    "html": "<span class=\"mp_address_group\"><a href=\"mailto:family@stoll.studio\" class=\"mp_address_email\">family@stoll.studio</a></span>",
-    "text": "family@stoll.studio"
-  },
-  "date": "2025-09-14T13:56:23.000Z",
-  "id": "19948837a156ab74"
+  "timestamp": "2025-09-14T15:16:09.231Z",
+  "subject": "No Subject",
+  "textContent": "Liebe.",
+  "sender": "Christophe Stoll <christophe.stoll@me.com>",
+  "recipient": "family@stoll.studio",
+  "date": "2025-09-14T15:16:09.231Z"
 }
