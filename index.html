@@ -32,7 +32,31 @@
         }
 
         body:active {
-            background-color: #111111;
+            background-color: #222222;
+            transform: scale(0.98);
+        }
+
+        .touch-feedback {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            pointer-events: none;
+            opacity: 0;
+            animation: touchRipple 0.6s ease-out;
+        }
+
+        @keyframes touchRipple {
+            0% {
+                opacity: 1;
+                transform: scale(0);
+            }
+            100% {
+                opacity: 0;
+                transform: scale(1);
+            }
         }
 
         .container {
@@ -190,6 +214,9 @@
                 document.getElementById('loading').style.display = 'none';
                 document.getElementById('content').style.display = 'block';
                 
+                // Play bird chirp when new data is loaded
+                playBirdChirp();
+                
             } catch (error) {
                 console.error('Error loading email:', error);
                 document.getElementById('loading').style.display = 'none';
@@ -203,9 +230,69 @@
         // Auto-refresh every minute to check for new emails
         setInterval(loadLatestEmail, 60000);
 
+        // Create bird chirping sound using Web Audio API
+        function playBirdChirp() {
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                
+                // Create a more realistic bird chirp sound
+                const oscillator1 = audioContext.createOscillator();
+                const oscillator2 = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                // Connect oscillators to gain node
+                oscillator1.connect(gainNode);
+                oscillator2.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                // Set frequencies for bird-like chirp (high pitched, melodic)
+                oscillator1.frequency.setValueAtTime(800, audioContext.currentTime);
+                oscillator1.frequency.exponentialRampToValueAtTime(1200, audioContext.currentTime + 0.1);
+                oscillator1.frequency.exponentialRampToValueAtTime(600, audioContext.currentTime + 0.2);
+                
+                oscillator2.frequency.setValueAtTime(1000, audioContext.currentTime);
+                oscillator2.frequency.exponentialRampToValueAtTime(1500, audioContext.currentTime + 0.1);
+                oscillator2.frequency.exponentialRampToValueAtTime(800, audioContext.currentTime + 0.2);
+                
+                // Set oscillator types for more natural sound
+                oscillator1.type = 'sine';
+                oscillator2.type = 'sine';
+                
+                // Create envelope for natural chirp sound
+                gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+                gainNode.gain.linearRampToValueAtTime(0.3, audioContext.currentTime + 0.05);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+                
+                // Play the chirp
+                oscillator1.start(audioContext.currentTime);
+                oscillator2.start(audioContext.currentTime);
+                oscillator1.stop(audioContext.currentTime + 0.3);
+                oscillator2.stop(audioContext.currentTime + 0.3);
+                
+                console.log('🐦 Bird chirp played!');
+            } catch (error) {
+                console.log('Could not play bird sound:', error);
+            }
+        }
+
+        // Add visual touch feedback
+        function addTouchFeedback() {
+            const feedback = document.createElement('div');
+            feedback.className = 'touch-feedback';
+            document.body.appendChild(feedback);
+            
+            // Remove the feedback element after animation
+            setTimeout(() => {
+                if (feedback.parentNode) {
+                    feedback.parentNode.removeChild(feedback);
+                }
+            }, 600);
+        }
+
         // Make entire screen clickable/touchable to refresh data
         document.body.addEventListener('click', function() {
             console.log('Screen tapped - refreshing data...');
+            addTouchFeedback();
             loadLatestEmail();
         });
 
@@ -217,6 +304,7 @@
         document.body.addEventListener('touchend', function(e) {
             e.preventDefault(); // Prevent default touch behavior
             console.log('Screen touched - refreshing data...');
+            addTouchFeedback();
             loadLatestEmail();
         });
     </script>
