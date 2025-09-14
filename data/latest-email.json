@@ -1,19 +1,9 @@
 {
-  "name": "latest-email.json",
-  "path": "data/latest-email.json",
-  "sha": "f8b1b19091c14ed217ea0db038833a9759024da2",
-  "size": 233,
-  "url": "https://api.github.com/repos/nitrada/family/contents/data/latest-email.json?ref=main",
-  "html_url": "https://github.com/nitrada/family/blob/main/data/latest-email.json",
-  "git_url": "https://api.github.com/repos/nitrada/family/git/blobs/f8b1b19091c14ed217ea0db038833a9759024da2",
-  "download_url": "https://raw.githubusercontent.com/nitrada/family/main/data/latest-email.json",
-  "type": "file",
-  "content": "ewogICJ0aW1lc3RhbXAiOiAiMjAyNS0wOS0xNFQxNToxNjowOS4yMzFaIiwK\nICAic3ViamVjdCI6ICJObyBTdWJqZWN0IiwKICAidGV4dENvbnRlbnQiOiAi\nTGllYmUuIiwKICAic2VuZGVyIjogIkNocmlzdG9waGUgU3RvbGwgPGNocmlz\ndG9waGUuc3RvbGxAbWUuY29tPiIsCiAgInJlY2lwaWVudCI6ICJmYW1pbHlA\nc3RvbGwuc3R1ZGlvIiwKICAiZGF0ZSI6ICIyMDI1LTA5LTE0VDE1OjE2OjA5\nLjIzMVoiCn0=\n",
-  "encoding": "base64",
-  "_links": {
-    "self": "https://api.github.com/repos/nitrada/family/contents/data/latest-email.json?ref=main",
-    "git": "https://api.github.com/repos/nitrada/family/git/blobs/f8b1b19091c14ed217ea0db038833a9759024da2",
-    "html": "https://github.com/nitrada/family/blob/main/data/latest-email.json"
-  },
+  "timestamp": "2025-09-14T16:44:19.850Z",
+  "subject": "No Subject",
+  "textContent": "Noch mehr Liebe.",
+  "sender": "Christophe Stoll <christophe.stoll@me.com>",
+  "recipient": "family@stoll.studio",
+  "date": "2025-09-14T16:44:19.850Z",
   "hasChanges": true
 }
