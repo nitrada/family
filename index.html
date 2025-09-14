@@ -116,14 +116,19 @@
                 // document.getElementById('subject').textContent = emailData.subject || 'No Subject';
                 document.getElementById('text').textContent = emailData.textContent || 'No content';
                 
-                // Extract sender name from the sender object
+                // Extract sender name from the sender string
                 let senderName = 'Unknown sender';
-                if (emailData.sender && emailData.sender.value && emailData.sender.value.length > 0) {
-                    const senderInfo = emailData.sender.value[0];
-                    senderName = senderInfo.name || senderInfo.address || 'Unknown sender';
-                    console.log('Sender info:', senderInfo, 'Extracted name:', senderName);
+                if (emailData.sender) {
+                    // Parse sender string like "Christophe Stoll <christophe.stoll@me.com>"
+                    const match = emailData.sender.match(/^(.+?)\s*<(.+?)>$/);
+                    if (match) {
+                        senderName = match[1].trim(); // Extract the name part
+                    } else {
+                        senderName = emailData.sender; // Use the whole string if no angle brackets
+                    }
+                    console.log('Sender string:', emailData.sender, 'Extracted name:', senderName);
                 } else {
-                    console.log('Sender data not found or invalid:', emailData.sender);
+                    console.log('Sender data not found:', emailData.sender);
                 }
                 
                 // Format timestamp in German 24h format
