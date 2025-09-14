@@ -114,7 +114,14 @@
                 // Update the display
                 document.getElementById('subject').textContent = emailData.subject || 'No Subject';
                 document.getElementById('text').textContent = emailData.textContent || 'No content';
-                document.getElementById('sender').textContent = `From: ${emailData.sender || 'Unknown sender'}`;
+                
+                // Extract sender name from the sender object
+                let senderName = 'Unknown sender';
+                if (emailData.sender && emailData.sender.value && emailData.sender.value.length > 0) {
+                    const senderInfo = emailData.sender.value[0];
+                    senderName = senderInfo.name || senderInfo.address || 'Unknown sender';
+                }
+                document.getElementById('sender').textContent = `From: ${senderName}`;
                 
                 // Format timestamp
                 let timeString = 'Recently';
