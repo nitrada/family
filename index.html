@@ -54,6 +54,7 @@
 
         .sender {
             margin-bottom: 0.5rem;
+            font-size: 1.5em;
         }
 
         .timestamp {
@@ -90,8 +91,7 @@
             <!--<h1 id="subject" class="subject"></h1>-->
             <div id="text" class="content"></div>
             <div class="meta">
-                <div id="sender" class="sender"></div>
-                <div id="timestamp" class="timestamp"></div>
+                <div id="sender-timestamp" class="sender"></div>
             </div>
         </div>
         <div id="error" class="error" style="display: none;">
@@ -110,9 +110,10 @@
                 }
                 
                 const emailData = await response.json();
+                console.log('Email data loaded:', emailData);
                 
                 // Update the display
-                document.getElementById('subject').textContent = emailData.subject || 'No Subject';
+                // document.getElementById('subject').textContent = emailData.subject || 'No Subject';
                 document.getElementById('text').textContent = emailData.textContent || 'No content';
                 
                 // Extract sender name from the sender object
@@ -120,23 +121,28 @@
                 if (emailData.sender && emailData.sender.value && emailData.sender.value.length > 0) {
                     const senderInfo = emailData.sender.value[0];
                     senderName = senderInfo.name || senderInfo.address || 'Unknown sender';
+                    console.log('Sender info:', senderInfo, 'Extracted name:', senderName);
+                } else {
+                    console.log('Sender data not found or invalid:', emailData.sender);
                 }
-                document.getElementById('sender').textContent = `From: ${senderName}`;
                 
-                // Format timestamp
+                // Format timestamp in German 24h format
                 let timeString = 'Recently';
                 if (emailData.timestamp) {
                     const date = new Date(emailData.timestamp);
-                    timeString = date.toLocaleDateString('en-US', {
+                    timeString = date.toLocaleDateString('de-DE', {
                         weekday: 'long',
                         year: 'numeric',
                         month: 'long',
                         day: 'numeric',
                         hour: '2-digit',
-                        minute: '2-digit'
+                        minute: '2-digit',
+                        hour12: false
                     });
                 }
-                document.getElementById('timestamp').textContent = timeString;
+                
+                // Combine sender and timestamp
+                document.getElementById('sender-timestamp').textContent = `${senderName} – ${timeString}`;
                 
                 // Show content, hide loading
                 document.getElementById('loading').style.display = 'none';
@@ -152,8 +158,8 @@
         // Load email on page load
         loadLatestEmail();
 
-        // Auto-refresh every 2 minutes to check for new emails
-        setInterval(loadLatestEmail, 120000);
+        // Auto-refresh every minute to check for new emails
+        setInterval(loadLatestEmail, 60000);
     </script>
 </body>
 </html>
