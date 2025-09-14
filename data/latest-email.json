@@ -1,9 +1,9 @@
 {
-  "timestamp": "2025-09-14T19:25:47.114Z",
+  "timestamp": "2025-09-14T19:44:47.254Z",
   "subject": "No Subject",
-  "textContent": "Hallo Christophe, schön dass du da bist! Dir eine gute erste Nacht",
-  "sender": "Peter Stoll - IB-Stoll <p.stoll@ib-stoll.de>",
-  "recipient": "<family@stoll.studio>",
-  "date": "2025-09-14T19:25:47.114Z",
+  "textContent": "Sleep well everyone.",
+  "sender": "Christophe Stoll <christophe.stoll@me.com>",
+  "recipient": "family@stoll.studio",
+  "date": "2025-09-14T19:44:47.254Z",
   "hasChanges": true
 }
