@@ -23,6 +23,16 @@
             align-items: flex-start;
             padding: 20px 0;
             line-height: 1.6;
+            cursor: pointer;
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            transition: background-color 0.2s ease;
+        }
+
+        body:active {
+            background-color: #111111;
         }
 
         .container {
@@ -192,6 +202,23 @@
 
         // Auto-refresh every minute to check for new emails
         setInterval(loadLatestEmail, 60000);
+
+        // Make entire screen clickable/touchable to refresh data
+        document.body.addEventListener('click', function() {
+            console.log('Screen tapped - refreshing data...');
+            loadLatestEmail();
+        });
+
+        // Also handle touch events for better mobile/touch screen support
+        document.body.addEventListener('touchstart', function(e) {
+            e.preventDefault(); // Prevent default touch behavior
+        });
+
+        document.body.addEventListener('touchend', function(e) {
+            e.preventDefault(); // Prevent default touch behavior
+            console.log('Screen touched - refreshing data...');
+            loadLatestEmail();
+        });
     </script>
 </body>
 </html>
