@@ -149,84 +149,7 @@
                 
                 const emailData = await response.json();
                 console.log('Email data loaded:', emailData);
-                
-                // Check if this is new data
-                const isNewData = lastEmailId === null || emailData.id !== lastEmailId;
-                if (isNewData) {
-                    console.log('New email data detected!');
-                    lastEmailId = emailData.id;
-                }
-                
-                // Update the display
-                // document.getElementById('subject').textContent = emailData.subject || 'No Subject';
-                document.getElementById('text').textContent = emailData.textContent || 'No content';
-                
-                // Extract sender name from the sender string
-                let senderName = 'Unknown sender';
-                if (emailData.sender) {
-                    // Parse sender string like "Christophe Stoll <christophe.stoll@me.com>"
-                    const match = emailData.sender.match(/^(.+?)\s*<(.+?)>$/);
-                    if (match) {
-                        senderName = match[1].trim(); // Extract the name part
-                    } else {
-                        senderName = emailData.sender; // Use the whole string if no angle brackets
-                    }
-                    console.log('Sender string:', emailData.sender, 'Extracted name:', senderName);
-                } else {
-                    console.log('Sender data not found:', emailData.sender);
-                }
-                
-                // Format timestamp with smart relative display
-                let timeString = 'Vor kurzem';
-                if (emailData.timestamp) {
-                    const now = new Date();
-                    const emailDate = new Date(emailData.timestamp);
-                    const diffMs = now - emailDate;
-                    const diffMinutes = Math.floor(diffMs / (1000 * 60));
-                    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-                    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-                    
-                    // Check if it's today
-                    const isToday = now.toDateString() === emailDate.toDateString();
-                    
-                    if (diffMinutes < 1) {
-                        timeString = 'Gerade eben';
-                    } else if (diffMinutes < 60) {
-                        timeString = `Vor ${diffMinutes} Minute${diffMinutes !== 1 ? 'n' : ''}`;
-                    } else if (diffHours < 6) {
-                        timeString = `Vor ${diffHours} Stunde${diffHours !== 1 ? 'n' : ''}`;
-                    } else if (isToday) {
-                        // Show only time if it's today
-                        timeString = emailDate.toLocaleTimeString('de-DE', {
-                            hour: '2-digit',
-                            minute: '2-digit',
-                            hour12: false
-                        });
-                    } else {
-                        // Show full date if it's not today
-                        timeString = emailDate.toLocaleDateString('de-DE', {
-                            weekday: 'long',
-                            year: 'numeric',
-                            month: 'long',
-                            day: 'numeric',
-                            hour: '2-digit',
-                            minute: '2-digit',
-                            hour12: false
-                        });
-                    }
-                }
-                
-                // Combine sender and timestamp
-                document.getElementById('sender-timestamp').textContent = `${senderName} – ${timeString}`;
-                
-                // Show content, hide loading
-                document.getElementById('loading').style.display = 'none';
-                document.getElementById('content').style.display = 'block';
-                
-                // Play bird chirp only when there's new data
-                if (isNewData) {
-                    playBirdChirp();
-                }
+                updateDisplay(emailData);
                 
             } catch (error) {
                 console.error('Error loading email:', error);
@@ -235,11 +158,118 @@
             }
         }
 
+        // Function to cycle to next email
+        async function cycleToNextEmail() {
+            try {
+                console.log('Cycling to next email...');
+                const response = await fetch('/api/latest-email?action=next');
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const emailData = await response.json();
+                console.log('Next email loaded:', emailData);
+                updateDisplay(emailData);
+                
+            } catch (error) {
+                console.error('Error cycling email:', error);
+                // Fallback to loading latest if cycling fails
+                loadLatestEmail();
+            }
+        }
+
+        // Shared function to update the display
+        function updateDisplay(emailData) {
+            // Check if this is new data (different email)
+            const isNewData = lastEmailId === null || emailData.id !== lastEmailId;
+            if (isNewData) {
+                console.log('New/different email data detected!');
+                lastEmailId = emailData.id;
+            }
+            
+            // Update the display
+            document.getElementById('text').textContent = emailData.textContent || 'No content';
+            
+            // Extract sender name from the sender string
+            let senderName = 'Unknown sender';
+            if (emailData.sender) {
+                // Parse sender string like "Christophe Stoll <christophe.stoll@me.com>"
+                const match = emailData.sender.match(/^(.+?)\s*<(.+?)>$/);
+                if (match) {
+                    senderName = match[1].trim(); // Extract the name part
+                } else {
+                    senderName = emailData.sender; // Use the whole string if no angle brackets
+                }
+                console.log('Sender string:', emailData.sender, 'Extracted name:', senderName);
+            } else {
+                console.log('Sender data not found:', emailData.sender);
+            }
+            
+            // Format timestamp with smart relative display
+            let timeString = 'Vor kurzem';
+            if (emailData.timestamp) {
+                const now = new Date();
+                const emailDate = new Date(emailData.timestamp);
+                const diffMs = now - emailDate;
+                const diffMinutes = Math.floor(diffMs / (1000 * 60));
+                const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+                const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+                
+                // Check if it's today
+                const isToday = now.toDateString() === emailDate.toDateString();
+                
+                if (diffMinutes < 1) {
+                    timeString = 'Gerade eben';
+                } else if (diffMinutes < 60) {
+                    timeString = `Vor ${diffMinutes} Minute${diffMinutes !== 1 ? 'n' : ''}`;
+                } else if (diffHours < 6) {
+                    timeString = `Vor ${diffHours} Stunde${diffHours !== 1 ? 'n' : ''}`;
+                } else if (isToday) {
+                    // Show only time if it's today
+                    timeString = emailDate.toLocaleTimeString('de-DE', {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        hour12: false
+                    });
+                } else {
+                    // Show full date if it's not today
+                    timeString = emailDate.toLocaleDateString('de-DE', {
+                        weekday: 'long',
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        hour12: false
+                    });
+                }
+            }
+            
+            // Show email position if there are multiple emails
+            let displayText = `${senderName} – ${timeString}`;
+            if (emailData.meta && emailData.meta.hasMultiple) {
+                displayText += ` (${emailData.meta.currentIndex}/${emailData.meta.totalEmails})`;
+            }
+            
+            // Combine sender and timestamp
+            document.getElementById('sender-timestamp').textContent = displayText;
+            
+            // Show content, hide loading
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('content').style.display = 'block';
+            
+            // Play bird chirp only when there's new data (different email)
+            if (isNewData) {
+                playBirdChirp();
+            }
+        }
+
         // Load email on page load
         loadLatestEmail();
 
-        // Auto-refresh every minute to check for new emails
-        setInterval(loadLatestEmail, 60000);
+        // Auto-refresh every 5 minutes to check for new emails (reduced frequency since cycling is manual)
+        setInterval(loadLatestEmail, 300000);
 
         // Create bird chirping sound - optimized for Raspberry Pi 4
         function playBirdChirp() {
@@ -317,11 +347,11 @@
             }, 600);
         }
 
-        // Make entire screen clickable/touchable to refresh data
+        // Make entire screen clickable/touchable to cycle through emails
         document.body.addEventListener('click', function() {
-            console.log('Screen tapped - refreshing data...');
+            console.log('Screen tapped - cycling to next email...');
             addTouchFeedback();
-            loadLatestEmail();
+            cycleToNextEmail(); // Changed from loadLatestEmail() to cycleToNextEmail()
         });
 
         // Also handle touch events for better mobile/touch screen support
@@ -331,9 +361,9 @@
 
         document.body.addEventListener('touchend', function(e) {
             e.preventDefault(); // Prevent default touch behavior
-            console.log('Screen touched - refreshing data...');
+            console.log('Screen touched - cycling to next email...');
             addTouchFeedback();
-            loadLatestEmail();
+            cycleToNextEmail(); // Changed from loadLatestEmail() to cycleToNextEmail()
         });
     </script>
 </body>
