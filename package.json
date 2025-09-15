@@ -2,10 +2,6 @@
     "name": "family-display",
     "version": "1.0.0",
     "description": "Family email display with Vercel KV storage",
-    "scripts": {
-      "dev": "vercel dev",
-      "build": "vercel build"
-    },
     "dependencies": {
       "@vercel/kv": "^0.2.4"
     },
