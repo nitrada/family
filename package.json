@@ -1,10 +1,7 @@
 {
     "name": "family-display",
     "version": "1.0.0",
-    "description": "Family email display with Vercel KV storage",
-    "dependencies": {
-      "@vercel/kv": "^0.2.4"
-    },
+    "description": "Family email display with Memory + GitHub fallback",
     "engines": {
       "node": ">=18.0.0"
     }

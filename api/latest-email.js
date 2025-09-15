@@ -1,13 +1,30 @@
-import { kv } from '@vercel/kv';
+// Memory + GitHub Fallback Solution
+let emailHistory = [];
+let currentIndex = 0;
 
-// Default email content
-const defaultEmail = {
-  subject: "Welcome to Family Display",
-  textContent: "Send an email to family@stoll.studio to see it appear here!",
-  sender: "System",
-  timestamp: new Date().toISOString(),
-  id: "default-1"
-};
+// Load from GitHub as fallback when memory is empty
+async function loadFromGitHub() {
+  try {
+    console.log('Loading fallback data from GitHub...');
+    const response = await fetch('https://raw.githubusercontent.com/nitrada/family/main/data/latest-email.json');
+    if (response.ok) {
+      const data = await response.json();
+      console.log('Successfully loaded from GitHub:', data.subject);
+      return [data]; // Return as array for consistency
+    }
+  } catch (error) {
+    console.error('GitHub fallback failed:', error);
+  }
+  
+  // Ultimate fallback
+  return [{
+    subject: "Welcome to Family Display",
+    textContent: "Send an email to family@stoll.studio to see it appear here!",
+    sender: "System",
+    timestamp: new Date().toISOString(),
+    id: "default-1"
+  }];
+}
 
 export default async function handler(req, res) {
   // Enable CORS
@@ -24,28 +41,23 @@ export default async function handler(req, res) {
     const action = req.query.action;
     
     try {
-      // Get email history from KV
-      let emailHistory = await kv.get('email-history') || [];
-      let currentIndex = await kv.get('current-index') || 0;
-      
-      // If no history exists, create default
+      // Initialize with GitHub data if memory is empty
       if (emailHistory.length === 0) {
-        emailHistory = [defaultEmail];
+        emailHistory = await loadFromGitHub();
         currentIndex = 0;
-        await kv.set('email-history', emailHistory);
-        await kv.set('current-index', currentIndex);
+        console.log('Initialized email history from GitHub, total emails:', emailHistory.length);
       }
       
       // Handle cycling actions
       if (action === 'next') {
         if (emailHistory.length > 1) {
           currentIndex = (currentIndex + 1) % emailHistory.length;
-          await kv.set('current-index', currentIndex);
+          console.log('Cycled to next email, index:', currentIndex);
         }
       } else if (action === 'previous') {
         if (emailHistory.length > 1) {
           currentIndex = (currentIndex - 1 + emailHistory.length) % emailHistory.length;
-          await kv.set('current-index', currentIndex);
+          console.log('Cycled to previous email, index:', currentIndex);
         }
       }
       
@@ -56,17 +68,24 @@ export default async function handler(req, res) {
         meta: {
           currentIndex: currentIndex + 1,
           totalEmails: emailHistory.length,
-          hasMultiple: emailHistory.length > 1
+          hasMultiple: emailHistory.length > 1,
+          source: emailHistory.length === 1 && currentEmail.id === 'default-1' ? 'default' : 'data'
         }
       });
     } catch (error) {
       console.error('Error in GET:', error);
-      res.status(200).json(defaultEmail);
+      res.status(200).json({
+        subject: "Error Loading",
+        textContent: "Unable to load email data",
+        sender: "System",
+        timestamp: new Date().toISOString(),
+        id: "error-1"
+      });
     }
   } 
   else if (req.method === 'POST') {
     try {
-      // Update email from n8n
+      // Process new email from n8n
       const { subject, textContent, sender, timestamp } = req.body;
       
       const newEmail = {
@@ -74,29 +93,30 @@ export default async function handler(req, res) {
         textContent: textContent || 'No content',
         sender: sender || 'Unknown sender',
         timestamp: timestamp || new Date().toISOString(),
-        id: `email-${Date.now()}` // Unique ID für jede Email
+        id: `email-${Date.now()}`
       };
       
-      // Get existing history
-      let emailHistory = await kv.get('email-history') || [];
+      console.log('Received new email via POST:', newEmail.subject);
       
-      // Add new email at the beginning (newest first)
+      // Add to beginning of history (newest first)
       emailHistory.unshift(newEmail);
       
       // Keep only last 5 emails
       if (emailHistory.length > 5) {
         emailHistory = emailHistory.slice(0, 5);
+        console.log('Trimmed email history to 5 emails');
       }
       
-      // Save back to KV
-      await kv.set('email-history', emailHistory);
-      await kv.set('current-index', 0); // Reset to newest email
-      await kv.set('last-update', Date.now()); // For SSE notifications
+      // Reset to newest email
+      currentIndex = 0;
+      
+      console.log('Email added to history. Total emails:', emailHistory.length);
       
       res.status(200).json({ 
         success: true, 
         message: 'Email added to history',
-        totalEmails: emailHistory.length 
+        totalEmails: emailHistory.length,
+        currentEmail: newEmail.subject
       });
     } catch (error) {
       console.error('Error in POST:', error);
