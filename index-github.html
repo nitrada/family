@@ -140,8 +140,8 @@
         
         async function loadLatestEmail() {
             try {
-                // Fetch the latest email data from local API
-                const response = await fetch('/api/latest-email');
+                // Fetch the latest email data from GitHub
+                const response = await fetch('https://raw.githubusercontent.com/nitrada/family/main/data/latest-email.json');
                 
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
