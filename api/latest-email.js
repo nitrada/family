@@ -1,7 +1,7 @@
 // In-memory storage (for demo - use database for production)
 let latestEmail = {
-  subject: "Welcome to Family Display",
-  textContent: "Send an email to family@stoll.studio to see it appear here!",
+  subject: "Hello.",
+  textContent: "Sende eine E-Mail an family@stoll.studio um sie hier zu sehen!",
   sender: "System",
   timestamp: new Date().toISOString()
 };
